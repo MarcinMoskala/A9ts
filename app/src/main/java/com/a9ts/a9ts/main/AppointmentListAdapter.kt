@@ -1,51 +1,46 @@
 package com.a9ts.a9ts.main
 
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.a9ts.a9ts.model.Appointment
+import com.a9ts.a9ts.BaseRecyclerViewAdapter
+import com.a9ts.a9ts.ItemAdapter
+import com.a9ts.a9ts.R
 import com.a9ts.a9ts.databinding.AppointmentItemBinding
+import com.a9ts.a9ts.databinding.AppointmentRejectedItemBinding
+import com.a9ts.a9ts.model.Appointment
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 
-class AppointmentListAdapter(private val appointments:ArrayList<Appointment>) : RecyclerView.Adapter<AppointmentListAdapter.ViewHolder>() {
+class AppointmentsListAdapter(items: List<ItemAdapter>) : BaseRecyclerViewAdapter(items)
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        Log.i("AppointmentListAdapter", "ViewHolderCreated")
+class AppointmentItemAdapter(private val appointment: Appointment) :
+    ItemAdapter(R.layout.appointment_item) {
 
-        val binding = AppointmentItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+    override fun setupView(view: View) {
+        val binding = AppointmentItemBinding.bind(view)
+        binding.fullname.text = appointment.inviteeName
+        binding.description.text = appointment.description
+        binding.date.text =
+            appointment.dateAndTime.format(DateTimeFormatter.ofPattern("E dd LLL")).toString()
+        binding.time.text =
+            DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(appointment.dateAndTime)
+                .toString()
+        binding.root.setOnClickListener {
+            Log.i("AppointmentItemAdapter", "Clicked on appointment")
+        }
     }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            Log.i("AppointmentListAdapter", appointments[position].toString())
-            holder.bind(appointments[position])
-        }
-
-
-    override fun getItemCount() = appointments.size
-
-    class ViewHolder(private val itemBinding : AppointmentItemBinding) : RecyclerView.ViewHolder(itemBinding.root), View.OnClickListener {
-
-        fun bind(appointment: Appointment) {
-            itemBinding.fullname.text = appointment.inviteeName
-            itemBinding.description.text = appointment.description
-            itemBinding.date.text = appointment.dateAndTime.format(DateTimeFormatter.ofPattern("E dd LLL")).toString()
-            itemBinding.time.text = DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).format(appointment.dateAndTime).toString()
-        }
-
-        init {
-            itemBinding.root.setOnClickListener(this)
-        }
-
-        override fun onClick(v: View?) {
-            Log.i("MainActivity", "Click")
-        }
-
-    }
-
 }
 
+class AppointmentRejectedInfoItemAdapter(private val appointment: Appointment) :
+    ItemAdapter(R.layout.appointment_rejected_item) {
 
+    override fun setupView(view: View) {
+        val binding = AppointmentRejectedItemBinding.bind(view)
+        binding.fullname.text = appointment.inviteeName
+        binding.date.text =
+            appointment.dateAndTime.format(DateTimeFormatter.ofPattern("E dd LLL")).toString()
+        binding.root.setOnClickListener {
+            Log.i("AppointmentItemAdapter", "Clicked on appointment rejected")
+        }
+    }
+}
